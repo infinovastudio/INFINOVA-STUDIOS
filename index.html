@@ -613,6 +613,7 @@
                                         <th class="p-4">Image</th>
                                         <th class="p-4">Title</th>
                                         <th class="p-4">Category</th>
+                                        <th class="p-4">Ratio</th>
                                         <th class="p-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -707,6 +708,14 @@
                     </select>
                 </div>
                 <div>
+                    <label class="block text-xs font-bold text-[#B8B8AE] uppercase mb-1">Photo Ratio</label>
+                    <select id="modal-item-ratio" class="w-full px-4 py-3 bg-[#080906] border border-[#39371C] rounded-custom text-[#FFFFFF] text-sm">
+                        <option value="LANDSCAPE">LANDSCAPE (16:9)</option>
+                        <option value="SQUARE">SQUARE (1:1)</option>
+                        <option value="PORTRAIT">PORTRAIT (3:4)</option>
+                    </select>
+                </div>
+                <div>
                     <label class="block text-xs font-bold text-[#B8B8AE] uppercase mb-1">Image URL</label>
                     <input type="url" id="modal-item-img" required class="w-full px-4 py-3 bg-[#080906] border border-[#39371C] rounded-custom text-[#FFFFFF] text-sm" placeholder="https://images.unsplash.com/...">
                 </div>
@@ -788,12 +797,12 @@
         const db = getFirestore(app);
 
         const defaultPortfolio = [
-            { id: '1', title: 'FF THUMBNAIL', category: 'THUMBNAILS', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80', description: 'High engagement Free Fire thumbnail.', pinned: true },
-            { id: '2', title: 'TECH PODCAST VIRAL THUMBNAIL', category: 'THUMBNAILS', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80', description: 'Bold expressive visuals and high contrast typography.', pinned: false },
-            { id: '3', title: 'CYBERPUNK MUSIC FESTIVAL POSTER', category: 'POSTERS', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80', description: 'Futuristic event poster with neon accents.', pinned: false },
-            { id: '4', title: 'PRO ESPORTS JERSEY DESIGN', category: 'JERSEY', image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80', description: 'Custom sublimated jersey design for esports teams.', pinned: false },
-            { id: '5', title: 'MODERN SAAS LANDING PAGE', category: 'WEB DESIGNS', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80', description: 'High-converting sleek SaaS web design.', pinned: false },
-            { id: '6', title: 'VIRAL CINEMATIC MONTAGE', category: 'VIDEO EDITING', image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80', description: 'High-tempo gaming montage edit.', pinned: false }
+            { id: '1', title: 'FF THUMBNAIL', category: 'THUMBNAILS', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80', description: 'High engagement Free Fire thumbnail.', pinned: true, ratio: 'LANDSCAPE' },
+            { id: '2', title: 'TECH PODCAST VIRAL THUMBNAIL', category: 'THUMBNAILS', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80', description: 'Bold expressive visuals and high contrast typography.', pinned: false, ratio: 'SQUARE' },
+            { id: '3', title: 'CYBERPUNK MUSIC FESTIVAL POSTER', category: 'POSTERS', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80', description: 'Futuristic event poster with neon accents.', pinned: false, ratio: 'PORTRAIT' },
+            { id: '4', title: 'PRO ESPORTS JERSEY DESIGN', category: 'JERSEY', image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80', description: 'Custom sublimated jersey design for esports teams.', pinned: false, ratio: 'SQUARE' },
+            { id: '5', title: 'MODERN SAAS LANDING PAGE', category: 'WEB DESIGNS', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80', description: 'High-converting sleek SaaS web design.', pinned: false, ratio: 'LANDSCAPE' },
+            { id: '6', title: 'VIRAL CINEMATIC MONTAGE', category: 'VIDEO EDITING', image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80', description: 'High-tempo gaming montage edit.', pinned: false, ratio: 'LANDSCAPE' }
         ];
 
         const defaultMarquee = [
@@ -824,13 +833,19 @@
                             category: item.category,
                             image: item.image,
                             description: item.description,
-                            pinned: item.pinned || false
+                            pinned: item.pinned || false,
+                            ratio: item.ratio || 'LANDSCAPE'
                         });
                     }
                     const freshP = await getDocs(collection(db, "portfolio"));
                     portfolio = freshP.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
-                    portfolio = pSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), pinned: doc.data().pinned || false }));
+                    portfolio = pSnapshot.docs.map(doc => ({ 
+                        id: doc.id, 
+                        ...doc.data(), 
+                        pinned: doc.data().pinned || false,
+                        ratio: doc.data().ratio || 'LANDSCAPE'
+                    }));
                 }
 
                 const mSnapshot = await getDocs(collection(db, "marquee"));
@@ -886,6 +901,12 @@
             renderVideoEditing();
         }
 
+        function getRatioClass(ratio) {
+            if (ratio === 'SQUARE') return 'aspect-square';
+            if (ratio === 'PORTRAIT') return 'aspect-[3/4]';
+            return 'aspect-video'; // LANDSCAPE default
+        }
+
         function renderGraphicDesigns(filter = 'all', searchQuery = '') {
             const grid = document.getElementById('graphic-designs-grid');
             const empty = document.getElementById('graphic-empty');
@@ -923,10 +944,11 @@
             }
 
             itemsToRender.forEach(item => {
+                const ratioClass = getRatioClass(item.ratio);
                 const card = document.createElement('div');
                 card.className = 'bg-[#191A0B] rounded-custom overflow-hidden border border-[#39371C] group hover:border-[#F5D85E] transition-all shadow-xl';
                 card.innerHTML = `
-                    <div class="relative aspect-video overflow-hidden cursor-pointer" onclick="openLightbox('${item.id}')">
+                    <div class="relative ${ratioClass} overflow-hidden cursor-pointer" onclick="openLightbox('${item.id}')">
                         <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/191A0B/F5D85E?text=Graphic'">
                         <div class="absolute top-3 left-3 bg-[#080906]/80 backdrop-blur border border-[#39371C] text-[#FFFFFF] text-xs font-bold px-3 py-1 rounded-full">
                             ${item.category}
@@ -961,10 +983,11 @@
             }
 
             items.forEach(item => {
+                const ratioClass = getRatioClass(item.ratio);
                 const card = document.createElement('div');
                 card.className = 'bg-[#191A0B] rounded-custom overflow-hidden border border-[#39371C] group hover:border-[#F5D85E] transition-all shadow-xl';
                 card.innerHTML = `
-                    <div class="relative aspect-video overflow-hidden cursor-pointer" onclick="openLightbox('${item.id}')">
+                    <div class="relative ${ratioClass} overflow-hidden cursor-pointer" onclick="openLightbox('${item.id}')">
                         <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/191A0B/F5D85E?text=Web+Design'">
                         <div class="absolute top-3 left-3 bg-[#080906]/80 backdrop-blur border border-[#39371C] text-[#FFFFFF] text-xs font-bold px-3 py-1 rounded-full">
                             ${item.category}
@@ -999,10 +1022,11 @@
             }
 
             items.forEach(item => {
+                const ratioClass = getRatioClass(item.ratio);
                 const card = document.createElement('div');
                 card.className = 'bg-[#191A0B] rounded-custom overflow-hidden border border-[#39371C] group hover:border-[#F5D85E] transition-all shadow-xl';
                 card.innerHTML = `
-                    <div class="relative aspect-video overflow-hidden cursor-pointer" onclick="openLightbox('${item.id}')">
+                    <div class="relative ${ratioClass} overflow-hidden cursor-pointer" onclick="openLightbox('${item.id}')">
                         <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/191A0B/F5D85E?text=Video+Edit'">
                         <div class="absolute top-3 left-3 bg-[#080906]/80 backdrop-blur border border-[#39371C] text-[#FFFFFF] text-xs font-bold px-3 py-1 rounded-full">
                             ${item.category}
@@ -1192,18 +1216,19 @@
                     const id = document.getElementById('modal-item-id').value;
                     const title = document.getElementById('modal-item-title').value;
                     const category = document.getElementById('modal-item-cat').value;
+                    const ratio = document.getElementById('modal-item-ratio').value;
                     const image = document.getElementById('modal-item-img').value;
                     const description = document.getElementById('modal-item-desc').value;
 
                     try {
                         if (id) {
                             const docRef = doc(db, "portfolio", id);
-                            await updateDoc(docRef, { title, category, image, description });
+                            await updateDoc(docRef, { title, category, ratio, image, description });
                             const item = portfolio.find(p => p.id === id);
-                            if (item) { item.title = title; item.category = category; item.image = image; item.description = description; }
+                            if (item) { item.title = title; item.category = category; item.ratio = ratio; item.image = image; item.description = description; }
                         } else {
-                            const docRef = await addDoc(collection(db, "portfolio"), { title, category, image, description, pinned: false });
-                            portfolio.unshift({ id: docRef.id, title, category, image, description, pinned: false });
+                            const docRef = await addDoc(collection(db, "portfolio"), { title, category, ratio, image, description, pinned: false });
+                            portfolio.unshift({ id: docRef.id, title, category, ratio, image, description, pinned: false });
                         }
 
                         renderAllGalleries();
@@ -1282,6 +1307,7 @@
                     <td class="p-4"><img src="${item.image}" class="w-16 h-10 object-cover rounded" onerror="this.src='https://placehold.co/100x60/191A0B/F5D85E?text=Img'"></td>
                     <td class="p-4 font-bold text-[#FFFFFF]">${item.title} ${item.pinned ? '<span class="ml-2 text-xs bg-[#F5D85E]/20 text-[#F5D85E] px-2 py-0.5 rounded-full"><i class="fa-solid fa-thumbtack"></i> Pinned</span>' : ''}</td>
                     <td class="p-4"><span class="bg-[#080906] px-2.5 py-1 rounded text-xs">${item.category}</span></td>
+                    <td class="p-4"><span class="bg-[#080906] text-[#F5D85E] px-2.5 py-1 rounded text-xs font-semibold">${item.ratio || 'LANDSCAPE'}</span></td>
                     <td class="p-4 text-right space-x-2">
                         ${isGraphic ? `<button onclick="togglePinItem('${item.id}')" class="${item.pinned ? 'text-[#F5D85E] bg-[#F5D85E]/15' : 'text-[#B8B8AE] bg-[#080906]'} hover:text-[#F5D85E] px-2.5 py-1.5 rounded text-xs transition-all border border-[#39371C]" title="${item.pinned ? 'Unpin Design' : 'Pin Design'}"><i class="fa-solid fa-thumbtack"></i></button>` : ''}
                         <button onclick="editPortfolioItem('${item.id}')" class="text-[#B8B8AE] hover:text-[#FFFFFF] px-2 py-1"><i class="fa-solid fa-pen"></i></button>
@@ -1333,6 +1359,8 @@
             document.getElementById('admin-modal-title').textContent = 'Add Portfolio Item';
             document.getElementById('modal-item-id').value = '';
             document.getElementById('modal-item-title').value = '';
+            document.getElementById('modal-item-cat').value = 'THUMBNAILS';
+            document.getElementById('modal-item-ratio').value = 'LANDSCAPE';
             document.getElementById('modal-item-img').value = '';
             document.getElementById('modal-item-desc').value = '';
             document.getElementById('admin-portfolio-modal').classList.remove('hidden');
@@ -1345,6 +1373,7 @@
             document.getElementById('modal-item-id').value = item.id;
             document.getElementById('modal-item-title').value = item.title;
             document.getElementById('modal-item-cat').value = item.category;
+            document.getElementById('modal-item-ratio').value = item.ratio || 'LANDSCAPE';
             document.getElementById('modal-item-img').value = item.image;
             document.getElementById('modal-item-desc').value = item.description;
             document.getElementById('admin-portfolio-modal').classList.remove('hidden');
