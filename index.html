@@ -240,15 +240,15 @@
                 <p class="text-[#B8B8AE] text-sm mt-2">Browse published Infinova Studio graphic designs by category.</p>
             </div>
 
-            <!-- Category Filters & Search -->
+            <!-- Category Filters & Search (ALL set as first option) -->
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-12">
                 <div id="graphic-filters" class="flex flex-wrap justify-center gap-2">
-                    <button data-filter="THUMBNAILS" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-bold bg-[#F5D85E] text-[#080906] transition-all shadow-md">THUMBNAILS</button>
+                    <button data-filter="ALL" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-bold bg-[#F5D85E] text-[#080906] transition-all shadow-md">ALL</button>
+                    <button data-filter="THUMBNAILS" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">THUMBNAILS</button>
                     <button data-filter="POSTERS" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">POSTERS</button>
                     <button data-filter="LOGOS" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">LOGOS</button>
                     <button data-filter="BRANDING" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">BRANDING</button>
                     <button data-filter="JERSEY" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">JERSEY</button>
-                    <button data-filter="ALL" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">ALL</button>
                 </div>
                 <div class="w-full md:w-72 relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#B8B8AE]">
@@ -708,12 +708,12 @@
                 <div>
                     <label class="block text-xs font-bold text-[#B8B8AE] uppercase mb-1">Category / Section</label>
                     <select id="modal-item-cat" class="w-full px-4 py-3 bg-[#080906] border border-[#39371C] rounded-custom text-[#FFFFFF] text-sm">
+                        <option value="ALL">ALL</option>
                         <option value="THUMBNAILS">THUMBNAILS</option>
                         <option value="POSTERS">POSTERS</option>
                         <option value="LOGOS">LOGOS</option>
                         <option value="BRANDING">BRANDING</option>
                         <option value="JERSEY">JERSEY</option>
-                        <option value="ALL">ALL</option>
                         <option value="WEB DESIGNS">WEB DESIGNS</option>
                         <option value="VIDEO EDITING">VIDEO EDITING</option>
                     </select>
@@ -970,7 +970,7 @@
         }
 
         function renderAllGalleries() {
-            renderGraphicDesigns('THUMBNAILS');
+            renderGraphicDesigns('ALL'); // Default to ALL category on load
             renderWebDesigns();
             renderVideoEditing();
         }
@@ -981,7 +981,7 @@
             return 'aspect-video'; // LANDSCAPE default
         }
 
-        function renderGraphicDesigns(filter = 'THUMBNAILS', searchQuery = '') {
+        function renderGraphicDesigns(filter = 'ALL', searchQuery = '') {
             const grid = document.getElementById('graphic-designs-grid');
             const empty = document.getElementById('graphic-empty');
             const seeMoreContainer = document.getElementById('graphic-see-more-container');
@@ -1192,7 +1192,7 @@
             const graphicSearch = document.getElementById('graphic-search');
             if (graphicSearch) {
                 graphicSearch.addEventListener('input', (e) => {
-                    const activeFilter = document.querySelector('.graphic-filter-btn.bg-\\[\\#F5D85E\\]')?.getAttribute('data-filter') || 'THUMBNAILS';
+                    const activeFilter = document.querySelector('.graphic-filter-btn.bg-\\[\\#F5D85E\\]')?.getAttribute('data-filter') || 'ALL';
                     showAllGraphics = false;
                     renderGraphicDesigns(activeFilter, e.target.value);
                 });
@@ -1202,7 +1202,7 @@
             if (seeMoreBtn) {
                 seeMoreBtn.addEventListener('click', () => {
                     showAllGraphics = true;
-                    const activeFilter = document.querySelector('.graphic-filter-btn.bg-\\[\\#F5D85E\\]')?.getAttribute('data-filter') || 'THUMBNAILS';
+                    const activeFilter = document.querySelector('.graphic-filter-btn.bg-\\[\\#F5D85E\\]')?.getAttribute('data-filter') || 'ALL';
                     renderGraphicDesigns(activeFilter, document.getElementById('graphic-search').value);
                 });
             }
@@ -1510,7 +1510,7 @@
             document.getElementById('admin-modal-title').textContent = 'Add Portfolio Item';
             document.getElementById('modal-item-id').value = '';
             document.getElementById('modal-item-title').value = '';
-            document.getElementById('modal-item-cat').value = 'THUMBNAILS';
+            document.getElementById('modal-item-cat').value = 'ALL';
             document.getElementById('modal-item-ratio').value = 'LANDSCAPE';
             document.getElementById('modal-item-img').value = '';
             document.getElementById('modal-item-desc').value = '';
