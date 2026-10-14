@@ -262,11 +262,10 @@
                 <p class="text-[#B8B8AE] text-sm mt-2">Browse published Infinova Studio graphic designs by category.</p>
             </div>
 
-            <!-- Category Filters & Search -->
+            <!-- Category Filters & Search (Without ALL button) -->
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-12">
                 <div id="graphic-filters" class="flex flex-wrap justify-center gap-2">
-                    <button data-filter="all" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-bold bg-[#F5D85E] text-[#080906] transition-all shadow-md">ALL</button>
-                    <button data-filter="THUMBNAILS" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">THUMBNAILS</button>
+                    <button data-filter="THUMBNAILS" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-bold bg-[#F5D85E] text-[#080906] transition-all shadow-md">THUMBNAILS</button>
                     <button data-filter="POSTERS" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">POSTERS</button>
                     <button data-filter="LOGOS" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">LOGOS</button>
                     <button data-filter="BRANDING" class="graphic-filter-btn px-5 py-2.5 rounded-full text-sm font-medium bg-[#191A0B] text-[#B8B8AE] hover:text-[#FFFFFF] border border-[#39371C] transition-all">BRANDING</button>
@@ -896,7 +895,7 @@
         }
 
         function renderAllGalleries() {
-            renderGraphicDesigns('all');
+            renderGraphicDesigns('THUMBNAILS');
             renderWebDesigns();
             renderVideoEditing();
         }
@@ -907,7 +906,7 @@
             return 'aspect-video'; // LANDSCAPE default
         }
 
-        function renderGraphicDesigns(filter = 'all', searchQuery = '') {
+        function renderGraphicDesigns(filter = 'THUMBNAILS', searchQuery = '') {
             const grid = document.getElementById('graphic-designs-grid');
             const empty = document.getElementById('graphic-empty');
             const seeMoreContainer = document.getElementById('graphic-see-more-container');
@@ -918,7 +917,7 @@
 
             let filtered = portfolio.filter(item => {
                 const isGraphicCat = graphicCategories.includes(item.category);
-                const matchesCat = filter === 'all' || item.category === filter;
+                const matchesCat = item.category === filter;
                 const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.description.toLowerCase().includes(searchQuery.toLowerCase());
                 return isGraphicCat && matchesCat && matchesSearch;
             });
@@ -1096,7 +1095,7 @@
             const graphicSearch = document.getElementById('graphic-search');
             if (graphicSearch) {
                 graphicSearch.addEventListener('input', (e) => {
-                    const activeFilter = document.querySelector('.graphic-filter-btn.bg-\\[\\#F5D85E\\]')?.getAttribute('data-filter') || 'all';
+                    const activeFilter = document.querySelector('.graphic-filter-btn.bg-\\[\\#F5D85E\\]')?.getAttribute('data-filter') || 'THUMBNAILS';
                     showAllGraphics = false;
                     renderGraphicDesigns(activeFilter, e.target.value);
                 });
@@ -1106,7 +1105,7 @@
             if (seeMoreBtn) {
                 seeMoreBtn.addEventListener('click', () => {
                     showAllGraphics = true;
-                    const activeFilter = document.querySelector('.graphic-filter-btn.bg-\\[\\#F5D85E\\]')?.getAttribute('data-filter') || 'all';
+                    const activeFilter = document.querySelector('.graphic-filter-btn.bg-\\[\\#F5D85E\\]')?.getAttribute('data-filter') || 'THUMBNAILS';
                     renderGraphicDesigns(activeFilter, document.getElementById('graphic-search').value);
                 });
             }
